@@ -3,6 +3,7 @@ import { AuthProvider } from './application/context/auth.context';
 import { ProtectedRoute, PublicRoute } from './presentation/components/ProtectedRoute';
 import LoginPage from './presentation/pages/LoginPage';
 import DashboardPage from './presentation/pages/DashboardPage';
+import ProgramDetailPage from './presentation/pages/ProgramDetailPage';
 
 export default function App() {
   return (
@@ -28,6 +29,16 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Detalle de programa */}
+          <Route
+            path="/programs/:id"
+            element={
+              <ProtectedRoute>
+                <ProgramDetailPage />
               </ProtectedRoute>
             }
           />
