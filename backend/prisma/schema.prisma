@@ -1,0 +1,211 @@
+// Prisma schema — EmbryoApp
+// Refleja docs/architecture/data-model.md
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMINISTRADOR
+  VETERINARIO
+  OPERADOR
+  LECTOR
+}
+
+enum UserStatus {
+  ACTIVO
+  INACTIVO
+}
+
+enum OrganizationType {
+  FINCA
+  CLINICA
+  EMPRESA_REPRODUCCION
+}
+
+enum OrganizationStatus {
+  ACTIVA
+  INACTIVA
+}
+
+enum ProgramStatus {
+  PLANIFICADO
+  EN_CURSO
+  PAUSADO
+  COMPLETADO
+  CANCELADO
+}
+
+enum ProgramEntityType {
+  DONANTE
+  RECEPTORA
+  PACIENTE
+  EMBRION
+}
+
+enum ProgramEntityStatus {
+  ACTIVA
+  INACTIVA
+}
+
+enum ActivityType {
+  SINCRONIZACION_FOLICULAR
+  ASPIRACION_FOLICULAR
+  TRANSFERENCIA_EMBRION
+  DIAGNOSTICO_GESTACION
+  OTRO
+}
+
+enum ActivityStatus {
+  PENDIENTE
+  COMPLETADA
+  ATRASADA
+  CANCELADA
+}
+
+enum SyncOperation {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+enum SyncStatus {
+  PENDIENTE
+  SINCRONIZADO
+  ERROR
+}
+
+model Organization {
+  id               String             @id @default(uuid())
+  name             String
+  organizationType OrganizationType   @map("organization_type")
+  status           OrganizationStatus @default(ACTIVA)
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @updatedAt @map("updated_at")
+
+  users    User[]
+  programs Program[]
+
+  @@map("organizations")
+}
+
+model User {
+  id             String     @id @default(uuid())
+  organizationId String     @map("organization_id")
+  fullName       String     @map("full_name")
+  email          String     @unique
+  passwordHash   String     @map("password_hash")
+  role           UserRole
+  status         UserStatus @default(ACTIVO)
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+
+  organization        Organization   @relation(fields: [organizationId], references: [id])
+  assignedActivities   Activity[]     @relation("ActivityAssignee")
+  observations         Observation[]
+  auditLogs            AuditLog[]
+
+  @@map("users")
+}
+
+model Program {
+  id                String        @id @default(uuid())
+  organizationId    String        @map("organization_id")
+  code              String        @unique
+  name              String
+  status            ProgramStatus @default(PLANIFICADO)
+  startDate         DateTime      @map("start_date")
+  estimatedEndDate  DateTime?     @map("estimated_end_date")
+  notes             String?
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+
+  organization Organization    @relation(fields: [organizationId], references: [id])
+  entities     ProgramEntity[]
+  activities   Activity[]
+  observations Observation[]
+
+  @@map("programs")
+}
+
+model ProgramEntity {
+  id                 String              @id @default(uuid())
+  programId          String              @map("program_id")
+  entityType         ProgramEntityType   @map("entity_type")
+  name               String
+  externalReference  String?             @map("external_reference")
+  status             ProgramEntityStatus @default(ACTIVA)
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+
+  program      Program       @relation(fields: [programId], references: [id])
+  observations Observation[]
+
+  @@map("program_entities")
+}
+
+model Activity {
+  id             String         @id @default(uuid())
+  programId      String         @map("program_id")
+  activityType   ActivityType   @map("activity_type")
+  scheduledDate  DateTime       @map("scheduled_date")
+  completedDate  DateTime?      @map("completed_date")
+  status         ActivityStatus @default(PENDIENTE)
+  notes          String?
+  assignedToUserId String?      @map("assigned_to_user_id")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  program      Program @relation(fields: [programId], references: [id])
+  assignedTo   User?   @relation("ActivityAssignee", fields: [assignedToUserId], references: [id])
+
+  @@map("activities")
+}
+
+model Observation {
+  id           String   @id @default(uuid())
+  programId    String   @map("program_id")
+  entityId     String?  @map("entity_id")
+  authorUserId String   @map("author_user_id")
+  content      String
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  program Program        @relation(fields: [programId], references: [id])
+  entity  ProgramEntity? @relation(fields: [entityId], references: [id])
+  author  User           @relation(fields: [authorUserId], references: [id])
+
+  @@map("observations")
+}
+
+model AuditLog {
+  id               String   @id @default(uuid())
+  entityType       String   @map("entity_type")
+  entityId         String   @map("entity_id")
+  action           String
+  performedByUserId String  @map("performed_by_user_id")
+  createdAt        DateTime @default(now()) @map("created_at")
+  metadata         Json?
+
+  performedBy User @relation(fields: [performedByUserId], references: [id])
+
+  @@map("audit_logs")
+}
+
+model SyncQueueItem {
+  id         String        @id @default(uuid())
+  entityType String        @map("entity_type")
+  entityId   String        @map("entity_id")
+  operation  SyncOperation
+  payload    Json
+  status     SyncStatus    @default(PENDIENTE)
+  createdAt  DateTime      @default(now()) @map("created_at")
+  updatedAt  DateTime      @updatedAt @map("updated_at")
+
+  @@map("sync_queue")
+}
