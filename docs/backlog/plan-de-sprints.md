@@ -742,7 +742,7 @@ Actualizar este bloque al terminar cada semana.
 |---|---|---|
 | Semana 1 | Autenticación (HU-001, HU-002) | ✅ Completada |
 | Semana 2 | Programas (HU-003, HU-004, HU-005) | ✅ Completada |
-| Semana 3 | Entidades (HU-006) | Pendiente |
+| Semana 3 | Entidades (HU-006) | Backend ✅ — Frontend pendiente |
 | Semana 4 | Actividades (HU-007, HU-008) | Pendiente |
 | Semana 5 | Offline (HU-009) | Pendiente |
 | Semana 6 | Sincronización + QA (HU-010) | Pendiente |
