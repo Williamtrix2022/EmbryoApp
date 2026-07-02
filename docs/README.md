@@ -35,6 +35,7 @@ Se ha definido la base inicial del producto con enfoque en viabilidad comercial,
 ## Preparación para desarrollo
 - [Plan de implementación inicial](implementation/implementation-plan.md)
 - [Backlog inicial](backlog/backlog-inicial.md)
+- [Plan de sprints semanales](backlog/plan-de-sprints.md) ← **Guía de trabajo activa**
 
 ## Principios de gobierno
 - No se iniciará desarrollo sin documentación aprobada.
