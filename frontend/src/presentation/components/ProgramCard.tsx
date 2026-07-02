@@ -71,7 +71,7 @@ export default function ProgramCard({ program, onStatusChange }: Props) {
         {/* Spacer */}
         <div className="ml-auto">
           <button
-            onClick={() => navigate(`/programs/${program.id}`)}
+            onClick={() => navigate(`/programs/${program.id}`, { state: { program } })}
             className="rounded-lg border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600 transition hover:bg-slate-50"
           >
             Ver detalle
