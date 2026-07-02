@@ -5,6 +5,7 @@ import { errorHandler } from './middlewares/error-handler';
 import { healthRouter } from './routes/health.routes';
 import { authRouter } from './routes/auth.routes';
 import { programRouter } from './routes/program.routes';
+import { entityRouter } from './routes/entity.routes';
 
 export function createApp(): Application {
   const app = express();
@@ -15,6 +16,7 @@ export function createApp(): Application {
   app.use(healthRouter);
   app.use('/api', authRouter);
   app.use('/api', programRouter);
+  app.use('/api', entityRouter);
 
   app.use(errorHandler);
 
