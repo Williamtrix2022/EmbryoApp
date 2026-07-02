@@ -14,7 +14,7 @@ export async function fetchEntities(
   entityType?: EntityType,
 ): Promise<Entity[]> {
   const query = entityType ? `?entityType=${entityType}` : '';
-  const res = await httpGet<EntitiesResponse>(`/programs/${programId}/entities${query}`);
+  const res = await httpGet<EntitiesResponse>(`/api/programs/${programId}/entities${query}`);
   return res.data;
 }
 
@@ -22,6 +22,6 @@ export async function createEntityApi(
   programId: string,
   input: AddEntityInput,
 ): Promise<Entity> {
-  const res = await httpPost<EntityResponse>(`/programs/${programId}/entities`, input);
+  const res = await httpPost<EntityResponse>(`/api/programs/${programId}/entities`, input);
   return res.data;
 }
